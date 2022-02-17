@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Elm Web Workers</title>
+  </head>
+  <body>
+    <div id="app">
+      <div></div>
+    </div>
+    <script src="main.js"></script>
+    <script>
+      const worker = new Worker('worker.js');
+      const app = Elm.Main.init({
+        node: document.getElementById('app')
+      });
+
+      app.ports.increment.subscribe(int => worker.postMessage({
+        type: 'increment',
+        value: int
+      }))
+
+      app.ports.decrement.subscribe(int => worker.postMessage({
+        type: 'decrement',
+        value: int
+      }))
+
+      worker.onmessage = function( { data }) {
+        app.ports.receiveCount.send(data);
+      }
+    </script>
+  </body>
+</html>
